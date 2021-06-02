@@ -3,7 +3,7 @@
 @section('content')
 
 <div class="float-left my-2">
-  <a class="btn btn-success" href="{{ route('restaurants.create') }}"> Input Menu</a>
+  <a class="btn btn-success" href="{{ route('restaurant.create') }}"> Input Menu</a>
 
 </div>
 
