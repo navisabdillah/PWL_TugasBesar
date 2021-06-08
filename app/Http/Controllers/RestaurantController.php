@@ -29,7 +29,7 @@ class RestaurantController extends Controller
         ->orderBy('jenis','desc')
         ->simplePaginate(3);
 
-        return view('restaurants.index' , compact('restaurants'))
+        return view('home' , compact('restaurants'))
         ->with('i',(request()->input('page',1)-1)*5);
     }
 

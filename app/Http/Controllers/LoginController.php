@@ -14,9 +14,10 @@ class LoginController extends Controller
     }
     public function postlogin(Request $request){
         if(Auth::attempt($request->only('email','password'))){
-            return redicrect('/home');
+            return redirect('/home');
         }
         return view('/');
+
     }
     public function registrasi(){
         return view('Login.registrasi');
@@ -30,5 +31,9 @@ class LoginController extends Controller
             'remember_token' => Str::random(60),
         ]);
         return view('welcome');
+    }
+    public function logout(){
+        Auth::logout();
+        return redirect('/');
     }
 }
