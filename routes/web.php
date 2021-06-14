@@ -2,7 +2,8 @@
 
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\HomeController;
-use App\Http\Controllers\RestaurantController;
+use App\Http\Controllers\BarangController;
+use App\Http\Controllers\PegawaiController;
 use Illuminate\Http\Request;
 
 /*
@@ -29,4 +30,6 @@ Route::get('/logout', [LoginController::class, 'logout'])->name('logout');
 Route::group(['middleware' => ['auth','ceklevel:admin,user']], function(){
     Route::get('/home', [HomeController::class, 'index'])->name('home');
 });
-Route::resource('restaurant', RestaurantController::class);
+Route::resource('barangs', BarangController::class);
+Route::resource('pegawais', PegawaiController::class);
+Route::resource('Home', PegawaiController::class);
