@@ -30,10 +30,10 @@ class LoginController extends Controller
             'password' => bcrypt($request->password),
             'remember_token' => Str::random(60),
         ]);
-        return view('welcome');
+        return view('Login.Login-aplikasi');
     }
     public function logout(){
         Auth::logout();
-        return redirect('/');
+        return redirect('/home');
     }
 }
