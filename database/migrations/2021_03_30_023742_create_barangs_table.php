@@ -20,6 +20,7 @@ class CreateBarangsTable extends Migration
             $table->text('Kategori_barang');
             $table->string('Harga');
             $table->string('Qty');
+            $table->string('image');
             $table->timestamps();
         });
     }
