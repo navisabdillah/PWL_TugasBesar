@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Barang;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 
 class BarangController extends Controller
@@ -33,7 +34,7 @@ class BarangController extends Controller
                 }
             }]
         ])
-        ->orderBy('Kode_Barang','desc')
+        ->orderBy('Kode_Barang','asc')
         ->simplePaginate(3);
         
         return view('barangs.index' , compact('barangs'))
@@ -61,16 +62,28 @@ class BarangController extends Controller
     {
         //
         $request->validate([
-            'Id_Barang' => 'required',
             'Kode_Barang' => 'required',
             'Nama_Barang' => 'required',
             'Kategori_barang' => 'required',
             'Harga' => 'required',
             'Qty' => 'required',
+            'Gambar' => 'required',
         ]);
-
-            // Fungsi eloquent untuk menambah data
-        Barang::create($request->all());
+        
+        // Fungsi eloquent untuk menambah data
+        // Barang::create($request->all());
+        if ($request->file('Gambar')) 
+        {
+            $image_name = $request->file('Gambar')->store('images', 'public');
+            Barang::create([
+                'Kode_Barang'                      => $request->Kode_Barang,
+                'Nama_Barang'                      => $request->Nama_Barang,
+                'Kategori_barang'                  => $request->Kategori_barang,
+                'Harga'                            => $request->Harga,
+                'Qty'                              => $request->Qty,
+                'Gambar'                           => $image_name,
+            ]);
+        }
 
         // Jika data berhasil ditambahkan, akan kembali ke halaman utama
         return redirect()->route('barangs.index')
@@ -102,7 +115,7 @@ class BarangController extends Controller
     {
         //
         $Barang = Barang::find($Id_Barang);
-        return view('barangs.edit', compact('Barang'));
+        return view('barangs.edit', ['Barang' => $Barang]);
     }
 
     /**
@@ -115,16 +128,25 @@ class BarangController extends Controller
     public function update(Request $request, $Id_Barang)
     {
         //
+        $Barang = Barang::find($Id_Barang);
         $request->validate([
-            'Id_Barang' => 'required',
             'Kode_Barang' => 'required',
             'Nama_Barang' => 'required',
             'Kategori_barang' => 'required',
             'Harga' => 'required',
             'Qty' => 'required',
+            'Gambar' => 'required',
         ]);
          // Fungsi eloquent untuk mengupdate data inputan kita
-         Barang::find($Id_Barang)->update($request->all());
+         // Barang::find($Id_Barang)->update($request->all());
+
+        if($Barang->Gambar && file_exists(storage_path('app/public/' . $Barang->Gambar))){
+            \Storage::delete('public/' . $Barang->Gambar);
+        }
+
+        $image_name = $request->file('Gambar')->store('images', 'public');
+        $Barang->Gambar = $image_name;
+        $Barang->save();
 
          // Jika data berhasil diupdate, akan kembali ke halaman utama
          return redirect()->route('barangs.index')
@@ -144,24 +166,5 @@ class BarangController extends Controller
         Barang::find($Id_Barang)->delete();
         return redirect()->route('barangs.index')
             -> with('success', 'Barang Berhasil Dihapus');
-    }
-    public function nilai($Id_Barang){
-        $barang = Mahasiswa_Matakuliah::with('mahasiswa')
-            ->where('mahasiswa_id', $Nim)
-            ->first();
-        $nilai = Mahasiswa_Matakuliah::with('matakuliah')
-            ->where('mahasiswa_id', $Nim)
-            ->get();
-        return view('mahasiswas.nilai', compact('mahasiswa', 'nilai'));            
-    }
-    public function cetak_pdf($Nim){
-        $mahasiswa = Mahasiswa_MataKuliah::with('mahasiswa')
-            ->where('mahasiswa_id', $Nim)
-            ->first();
-        $nilai = Mahasiswa_MataKuliah::with('matakuliah')
-            ->where('mahasiswa_id', $Nim)
-            ->get();
-        $pdf = PDF::loadview('mahasiswas.mahasiswas_pdf', compact('mahasiswa', 'nilai'));
-        return $pdf->stream();
     }
 }

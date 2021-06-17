@@ -4,9 +4,7 @@ namespace App\Models;
 
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\Mahasiswa as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-
 use Illuminate\Database\Eloquent\Model; // Model Eloquent
 
 class Barang extends Model
@@ -22,6 +20,10 @@ class Barang extends Model
         'Kategori_barang',
         'Harga',
         'Qty',
-        
+        'Gambar',
         ];
+
+        public function transaksi(){
+            return $this->hasMany(Transaksi::class);
+        }
 }
