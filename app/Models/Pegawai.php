@@ -21,6 +21,10 @@ class Pegawai extends Model
         'Nama_Pegawai',
         'Kategori_Pegawai',
         'Umur',
-                
+        'Gambar',       
         ];
+
+        public function transaksi(){
+            return $this->hasMany(Transaksi::class);
+        }
 }

@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use App\Models\Pegawai;
+
 class PegawaiController extends Controller
 {
     /**
@@ -60,16 +62,26 @@ class PegawaiController extends Controller
     {
         //
         $request->validate([
-            'Id_Pegawai' => 'required',
             'Kode_Pegawai' => 'required',
             'Nama_Pegawai' => 'required',
             'Kategori_Pegawai' => 'required',
             'Umur' => 'required',
-            
+            'Gambar' => 'required',
         ]);
 
             // Fungsi eloquent untuk menambah data
-            Pegawai::create($request->all());
+            // Pegawai::create($request->all());
+            if ($request->file('Gambar')) 
+            {
+                $image_name = $request->file('Gambar')->store('images', 'public');
+                Pegawai::create([
+                    'Kode_Pegawai'                      => $request->Kode_Pegawai,
+                    'Nama_Pegawai'                      => $request->Nama_Pegawai,
+                    'Kategori_Pegawai'                  => $request->Kategori_Pegawai,
+                    'Umur'                              => $request->Umur,
+                    'Gambar'                            => $image_name,
+                ]);
+            }
 
         // Jika data berhasil ditambahkan, akan kembali ke halaman utama
         return redirect()->route('pegawais.index')
@@ -101,7 +113,7 @@ class PegawaiController extends Controller
     {
         //
         $Pegawai = Pegawai::find($Id_Pegawai);
-        return view('pegawais.edit', compact('Pegawai'));
+        return view('pegawais.edit', ['Pegawai' => $Pegawai]);
     }
 
     /**
@@ -115,15 +127,27 @@ class PegawaiController extends Controller
     {
         //
         $request->validate([
-            'Id_Pegawai' => 'required',
             'Kode_Pegawai' => 'required',
             'Nama_Pegawai' => 'required',
             'Kategori_Pegawai' => 'required',
             'Umur' => 'required',
-            
+            'Gambar' => 'required',
         ]);
-         // Fungsi eloquent untuk mengupdate data inputan kita
-         Pegawai::find($Id_Pegawai)->update($request->all());
+        // Fungsi eloquent untuk mengupdate data inputan kita
+        // Pegawai::find($Id_Pegawai)->update($request->all());
+        $pegawais = Pegawai::find($Id_Pegawai);
+        $pegawais->Kode_Pegawai = $request->Kode_Pegawai;
+        $pegawais->Nama_Pegawai = $request->Nama_Pegawai;
+        $pegawais->Kategori_Pegawai = $request->Kategori_Pegawai;
+        $pegawais->Umur = $request->Umur;
+
+        if($pegawais->Gambar && file_exists(storage_path('app/public/' . $pegawais->Gambar))){
+            \Storage::delete('public/' . $pegawais->Gambar);
+        }
+
+        $image_name = $request->file('Gambar')->store('images', 'public');
+        $pegawais->Gambar = $image_name;
+        $pegawais->save();
 
          // Jika data berhasil diupdate, akan kembali ke halaman utama
          return redirect()->route('pegawais.index')
